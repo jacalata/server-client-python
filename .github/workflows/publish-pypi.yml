@@ -3,6 +3,8 @@ name: Be transparent
 on:
   workflow_dispatch:
   push:
+    branches:
+      - jac-not-master
     tags:
       - 'v*.*.*'
 
@@ -15,7 +17,7 @@ jobs:
         run: echo '${{ toJSON(github) }}'
   sometimes:
     name: Build a castle
-    if: ${{ github.ref.name }} == 'master' or ${{ github.event.base_ref }} == "refs/head/master" 
+    if: github.ref.name == 'master' or (github.event.base_ref == "refs/head/master")
     runs-on: ubuntu-latest
     steps:
       - name: Tell me what's going on here

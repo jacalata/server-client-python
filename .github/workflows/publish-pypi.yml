@@ -19,5 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Tell me what's going on here
-        run: echo '${{ toJSON(github) }}'
+        run: | 
+          echo '${{ github.event.base_ref }}'
+          echo '${{ github.ref.name }}'
+          echo '${{ toJSON(github) }}'
           

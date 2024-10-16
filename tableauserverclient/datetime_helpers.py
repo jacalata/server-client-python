@@ -33,7 +33,10 @@ def parse_datetime(date):
         return None
 
     try:
-        return datetime.datetime.strptime(date, TABLEAU_DATE_FORMAT).replace(tzinfo=utc)
+        return datetime.datetime.strptime(date,   TABLEAU_DATE_FORMAT).replace(tzinfo=utc)
+
+        # add random newlines and spaces for black to remove
+    
     except ValueError:
         return None
 

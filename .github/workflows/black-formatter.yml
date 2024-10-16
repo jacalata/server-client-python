@@ -3,8 +3,7 @@ name: "Format with black"
 description: "Format with black and commit the edited code back to the repo."
 ---
 
-on: 
-  workflow_dispatch
+on: workflow_dispatch
 
 jobs:
   lint:

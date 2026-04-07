@@ -3459,6 +3459,47 @@ Source files: server/endpoint/jobs_endpoint.py
 <br>
 <br>
 
+#### jobs.get
+
+```py
+jobs.get(job_id=None, req_options=None)
+```
+
+Retrieve jobs for the site. Endpoint is paginated and will return a list of jobs and pagination information. If a job_id is provided, the method will return information about that specific job. Specifying a job_id is deprecated and will be removed in a future version.
+
+
+REST API: [Get Background Jobs on Site](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_jobs_tasks_and_schedules.htm#get_background_jobs_on_site){:target="_blank"}
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`job_id` | (Optional) The `job_id` specifies the job to query. When provided, returns the status of that specific job.
+`req_options` | (Optional) You can pass the method a request object that contains additional parameters to filter the request.
+
+**Returns**
+
+Returns a list of `BackgroundJobItem` objects and a `PaginationItem` object.
+
+**Version**
+
+Version 2.6 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+import tableauserverclient as TSC
+tableau_auth = TSC.TableauAuth('USERNAME', 'PASSWORD')
+server = TSC.Server('https://SERVERURL')
+
+with server.auth.sign_in(tableau_auth):
+    all_jobs, pagination_item = server.jobs.get()
+    print("\nThere are {} jobs on site: ".format(pagination_item.total_available))
+    print([job.id for job in all_jobs])
+```
+
+<br>
+<br>
 
 #### jobs.get_by_id
 
@@ -3594,6 +3635,45 @@ Usually, you can just discard the return value without checking the job status. 
 **Example**
 
 See the `update_datasource_data.py` or `refresh.py` sample in the Samples directory.
+
+<br>
+<br>
+
+#### jobs.filter
+
+```py
+jobs.filter(**kwargs)
+```
+
+Returns a list of background jobs that match the specified filters. Fields and operators are passed as keyword arguments in the form `field_name=value` or `field_name__operator=value`.
+
+**Supported fields and operators**
+
+Field | Operators
+:--- | :---
+`args` | `has`
+`completed_at` | `eq`, `gt`, `gte`, `lt`, `lte`
+`created_at` | `eq`, `gt`, `gte`, `lt`, `lte`
+`job_type` | `eq`, `in`
+`notes` | `has`
+`priority` | `eq`, `gt`, `gte`, `lt`, `lte`
+`progress` | `eq`, `gt`, `gte`, `lt`, `lte`
+`started_at` | `eq`, `gt`, `gte`, `lt`, `lte`
+`status` | `eq`
+`subtitle` | `eq`, `has`
+`title` | `eq`, `has`
+
+**Returns**
+
+Returns a `QuerySet` of `BackgroundJobItem` objects.
+
+**Example**
+
+```py
+failed_jobs = server.jobs.filter(status='Failed')
+for job in failed_jobs:
+    print(job.id, job.type)
+```
 
 <br>
 <br>

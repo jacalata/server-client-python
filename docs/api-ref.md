@@ -4997,7 +4997,7 @@ Source file: models/site_item.py
 
 ### SiteAuthConfiguration class
 
-The `SiteAuthConfiguration` class contains the attributes for the authentication configuration on Tableau Cloud. This class represents the authentication configuration information returned when using the `sites.list_authentication_configurations` method.
+The `SiteAuthConfiguration` class contains the attributes for the authentication configuration on Tableau Cloud. This class represents the authentication configuration information returned when using the `sites.list_auth_configurations` method.
 
 **Attributes**
 
@@ -5017,7 +5017,7 @@ Attribute | Description
 # sign in, etc.
 
 # Get authentication configurations for the current site
-auth_configs = server.sites.list_authentication_configurations()
+auth_configs = server.sites.list_auth_configurations()
 
 # Display configuration details
 for config in auth_configs:
@@ -5324,15 +5324,15 @@ server.sites.delete('9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d')
 <br>
 <br>
 
-#### sites.list_authentication_configurations
+#### sites.list_auth_configurations
 
 ```py
-sites.list_authentication_configurations()
+sites.list_auth_configurations()
 ```
 
 Lists the authentication configurations for the current site.
 
-REST API: [List Authentication Configurations for the current Site](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_site.htm#list_authentication_configurations_site)
+REST API: [List Authentication Configurations for the current Site](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_site.htm#list_auth_configurations_site)
 
 **Returns**
 
@@ -5345,12 +5345,133 @@ Returns a list of authentication configurations for the current site.
 # server = TSC.Server('https://MY-SERVER')
 # sign in, etc.
 
-auth_configs = server.sites.list_authentication_configurations()
+auth_configs = server.sites.list_auth_configurations()
 for config in auth_configs:
     print(f"IDP Configuration ID: {config.idp_configuration_id}")
     print(f"Name: {config.idp_configuration_name}")
     print(f"Type: {config.auth_setting}")
     print(f"Enabled: {config.enabled}")
+```
+
+<br>
+<br>
+
+#### sites.get_by_content_url
+
+```py
+sites.get_by_content_url(content_url)
+```
+
+Returns the site with the specified content URL.
+
+REST API: [Query Site](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_site.htm#query_site){:target="_blank"}
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`content_url` | The `content_url` for the site to query. This is the `contentUrl` value in the REST API and corresponds to the portion of the URL after `/site/` (for example, `"MarketingTeam"`). Use an empty string for the default site.
+
+**Returns**
+
+Returns a `SiteItem`.
+
+**Version**
+
+Version 2.0 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+site = server.sites.get_by_content_url('MarketingTeam')
+print(site.id, site.name)
+```
+
+<br>
+<br>
+
+#### sites.encrypt_extracts
+
+```py
+sites.encrypt_extracts(site_id)
+```
+
+Encrypts all extracts on the specified site.
+
+REST API: [Encrypt Extracts](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_extract_and_encryption.htm#encrypt_extracts){:target="_blank"}
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`site_id` | The identifier (`id`) for the site on which to encrypt all extracts.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+server.sites.encrypt_extracts(server.site_id)
+```
+
+<br>
+<br>
+
+#### sites.decrypt_extracts
+
+```py
+sites.decrypt_extracts(site_id)
+```
+
+Decrypts all extracts on the specified site.
+
+REST API: [Decrypt Extracts](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_extract_and_encryption.htm#decrypt_extracts){:target="_blank"}
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`site_id` | The identifier (`id`) for the site on which to decrypt all extracts.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+server.sites.decrypt_extracts(server.site_id)
+```
+
+<br>
+<br>
+
+#### sites.re_encrypt_extracts
+
+```py
+sites.re_encrypt_extracts(site_id)
+```
+
+Re-encrypts all extracts on the specified site using new encryption keys.
+
+REST API: [Reencrypt Extracts](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_extract_and_encryption.htm#reencrypt_extracts){:target="_blank"}
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`site_id` | The identifier (`id`) for the site on which to re-encrypt all extracts.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+server.sites.re_encrypt_extracts(server.site_id)
 ```
 
 <br>
@@ -5965,7 +6086,7 @@ Name | Description
 `name` |   The name of the user. This attribute is required when you are creating a `UserItem` instance.
 `site_role` |  The role the user has on the site. This attribute is required if you are creating a `UserItem` instance. See *User Roles* below for details.
 `groups` | The groups that the user belongs to. You must run the populate_groups method to add the groups to the `UserItem`.
-`idp_configuration_id` | Tableau Cloud only. The authentication method for the user. To find the idp_configuration_id value, use sites.list_authentication_configurations method. **Important: Use idp_configuration_id or auth_setting, but not both.**
+`idp_configuration_id` | Tableau Cloud only. The authentication method for the user. To find the idp_configuration_id value, use sites.list_auth_configurations method. **Important: Use idp_configuration_id or auth_setting, but not both.**
 
 
 **User Auth**

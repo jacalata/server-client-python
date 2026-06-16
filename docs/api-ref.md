@@ -9548,4 +9548,524 @@ with open('./workbook_pdf.pdf', 'wb') as f:
 <br>
 <br>
 
+#### workbooks.populate_powerpoint
+
+```py
+workbooks.populate_powerpoint(workbook_item, req_options=None)
+```
+
+Populates the PowerPoint content of the specified workbook.
+
+This method retrieves the workbook as a PowerPoint (.pptx) file. After calling this method, the PowerPoint content is available through the workbook's `powerpoint` property.
+
+REST API: [Download Workbook PowerPoint](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#download_workbook_powerpoint){:target="_blank"}
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_item` | Specifies the workbook to populate.
+`req_options` | (Optional) You can pass in request options to specify the maximum age of the PowerPoint content rendered on the server.
+
+**Exceptions**
+
+Error | Description
+:--- | :---
+`Workbook item missing ID` | Raises an error if the ID of the workbook is missing.
+
+**Returns**
+
+None. The PowerPoint content is added to the `workbook_item` and can be accessed by its `powerpoint` field.
+
+**Version**
+
+Version 3.8 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+server.workbooks.populate_powerpoint(workbook_item)
+with open('./workbook.pptx', 'wb') as f:
+    f.write(workbook_item.powerpoint)
+```
+
+<br>
+<br>
+
+#### workbooks.create_extract
+
+```py
+workbooks.create_extract(workbook_item, encrypt=False, includeAll=True, datasources=None)
+```
+
+Creates extracts for the embedded data sources of the specified workbook.
+
+REST API: [Create Extracts for Embedded Data Sources in a Workbook](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_extract_and_encryption.htm#create_extracts_for_workbook)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_item` | The `WorkbookItem` to create extracts for.
+`encrypt` | (Optional) Specifies whether to encrypt the extracts. The default is `False`.
+`includeAll` | (Optional) Specifies whether to create extracts for all embedded data sources. The default is `True`. Set to `False` to specify individual data sources via the `datasources` parameter.
+`datasources` | (Optional) A list of `DatasourceItem` objects representing the embedded data sources to create extracts for. Only used when `includeAll=False`.
+
+**Returns**
+
+Returns a `JobItem` for the extract creation job.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+workbook = server.workbooks.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+job = server.workbooks.create_extract(workbook, encrypt=True)
+server.jobs.wait_for_job(job)
+```
+
+<br>
+<br>
+
+#### workbooks.delete_extract
+
+```py
+workbooks.delete_extract(workbook_item, includeAll=True, datasources=None)
+```
+
+Removes the extracts from the embedded data sources of the specified workbook.
+
+REST API: [Delete Extracts of Embedded Data Sources from a Workbook](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_extract_and_encryption.htm#delete_extracts_from_workbook)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_item` | The `WorkbookItem` to remove extracts from.
+`includeAll` | (Optional) Specifies whether to remove extracts for all embedded data sources. The default is `True`. Set to `False` to specify individual data sources via the `datasources` parameter.
+`datasources` | (Optional) A list of `DatasourceItem` objects representing the embedded data sources to remove extracts from. Only used when `includeAll=False`.
+
+**Returns**
+
+Returns a `JobItem` for the extract deletion job.
+
+**Version**
+
+Version 3.3 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+workbook = server.workbooks.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+job = server.workbooks.delete_extract(workbook)
+server.jobs.wait_for_job(job)
+```
+
+<br>
+<br>
+
+#### workbooks.populate_permissions
+
+```py
+workbooks.populate_permissions(workbook_item)
+```
+
+Populates the permissions for the specified workbook.
+
+REST API: [List Workbook Permissions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_permissions.htm#query_workbook_permissions)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_item` | The `WorkbookItem` to populate with permissions.
+
+**Version**
+
+Version 2.0 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+workbook = server.workbooks.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+server.workbooks.populate_permissions(workbook)
+for permission in workbook.permissions:
+    print(permission.grantee_id, permission.capabilities)
+```
+
+<br>
+<br>
+
+#### workbooks.update_permissions
+
+```py
+workbooks.update_permissions(workbook_item, rules)
+```
+
+Adds or updates permissions for the specified workbook. Any server side permissions not included in `rules` are removed.
+
+REST API: [Replace Content Permissions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_permissions.htm#replace_permissions_for_content)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_item` | The `WorkbookItem` to update permissions for.
+`rules` | A list of `PermissionsRule` objects representing the permissions to add or update.
+
+**Version**
+
+Version 2.0 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+<br>
+<br>
+
+#### workbooks.delete_permission
+
+```py
+workbooks.delete_permission(workbook_item, capability_item)
+```
+
+Removes a permission from the specified workbook.
+
+REST API: [Delete Workbook Permission](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_permissions.htm#delete_workbook_permission)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_item` | The `WorkbookItem` to remove the permission from.
+`capability_item` | The `PermissionsRule` object representing the permission to remove.
+
+**Version**
+
+Version 2.0 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+<br>
+<br>
+
+#### workbooks.populate_revisions
+
+```py
+workbooks.populate_revisions(workbook_item)
+```
+
+Populates the revision history for the specified workbook.
+
+REST API: [Get Workbook Revisions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#get_workbook_revisions)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_item` | The `WorkbookItem` to populate with revision history.
+
+**Exceptions**
+
+Error | Description
+:--- | :---
+`Workbook item missing ID. Workbook must be retrieved from server first.` | Raises an exception if the `workbook_item` does not have an id.
+
+**Version**
+
+Version 2.3 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+workbook = server.workbooks.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+server.workbooks.populate_revisions(workbook)
+for revision in workbook.revisions:
+    print(revision.revision_number, revision.created_at)
+```
+
+<br>
+<br>
+
+#### workbooks.download_revision
+
+```py
+workbooks.download_revision(workbook_id, revision_number, filepath=None, include_extract=True)
+```
+
+Downloads a specific revision of the specified workbook.
+
+REST API: [Download Workbook Revision](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#download_workbook_revision)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_id` | The identifier (`id`) for the `WorkbookItem`.
+`revision_number` | The revision number to download. Pass `None` to download the current (latest) revision.
+`filepath` | (Optional) Downloads the file to the location you specify. If no location is specified (the default is `filepath=None`), the file is downloaded to the current working directory.
+`include_extract` | (Optional) Specifies whether to download the file with the extract. The default is `True`.
+
+**Exceptions**
+
+Error | Description
+:--- | :---
+`Workbook ID undefined` | Raises an exception if a valid `workbook_id` is not provided.
+
+**Returns**
+
+The file path to the downloaded workbook revision.
+
+**Version**
+
+Version 2.3 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+file_path = server.workbooks.download_revision(
+    '1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b',
+    revision_number='2'
+)
+print("\nDownloaded revision to {0}.".format(file_path))
+```
+
+<br>
+<br>
+
+#### workbooks.delete_revision
+
+```py
+workbooks.delete_revision(workbook_id, revision_number)
+```
+
+Removes a specific revision of the specified workbook from Tableau Server.
+
+REST API: [Remove Workbook Revision](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_revisions.htm#remove_workbook_revision)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_id` | The identifier (`id`) for the `WorkbookItem`.
+`revision_number` | The revision number to delete.
+
+**Version**
+
+Version 2.3 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+server.workbooks.delete_revision('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b', '2')
+```
+
+<br>
+<br>
+
+#### workbooks.schedule_extract_refresh
+
+```py
+workbooks.schedule_extract_refresh(schedule_id, item)
+```
+
+Convenience method to add a workbook to an existing extract refresh schedule.
+
+REST API: [Add Workbook to Server Schedule](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_jobs_tasks_and_schedules.htm#add_workbook_to_schedule)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`schedule_id` | The identifier of the schedule to add the workbook to.
+`item` | The `WorkbookItem` to add to the schedule.
+
+**Returns**
+
+Returns a list of `AddResponse` objects.
+
+**Version**
+
+Version 2.8 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+workbook = server.workbooks.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+result = server.workbooks.schedule_extract_refresh('schedule-id-here', workbook)
+```
+
+<br>
+<br>
+
+#### workbooks.update_connections
+
+```py
+workbooks.update_connections(workbook_item, connection_luids, authentication_type, username=None, password=None, embed_password=None)
+```
+
+Bulk updates one or more workbook connections by LUID, including the authentication type, username, password, and whether to embed the password.
+
+REST API: [Update Workbook Connections](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#update_workbook_connections)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`workbook_item` | The `WorkbookItem` containing the connections to update.
+`connection_luids` | An iterable of connection LUIDs (strings) to update.
+`authentication_type` | The authentication type to use (e.g., `'AD Service Principal'`).
+`username` | (Optional) The username to set (e.g., client ID for keypair auth).
+`password` | (Optional) The password or secret to set.
+`embed_password` | (Optional) Whether to embed the password.
+
+**Returns**
+
+Returns a list of updated `ConnectionItem` objects.
+
+**Example**
+
+```py
+workbook = server.workbooks.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+server.workbooks.populate_connections(workbook)
+luids = [conn.id for conn in workbook.connections]
+updated = server.workbooks.update_connections(workbook, luids, 'UserNameAndPassword', username='myuser', password='mypassword', embed_password=True)
+```
+
+<br>
+<br>
+
+#### workbooks.add_tags
+
+```py
+workbooks.add_tags(item, tags)
+```
+
+Adds one or more tags to the specified workbook.
+
+REST API: [Add Tags to Workbook](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#add_tags_to_workbook)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`item` | The `WorkbookItem` or workbook ID to add tags to.
+`tags` | A single tag string or iterable of tag strings to add.
+
+**Returns**
+
+Returns a `set[str]` of the tags added.
+
+**Example**
+
+```py
+server.workbooks.add_tags(workbook_item, ['finance', 'quarterly'])
+```
+
+<br>
+<br>
+
+#### workbooks.delete_tags
+
+```py
+workbooks.delete_tags(item, tags)
+```
+
+Removes one or more tags from the specified workbook.
+
+REST API: [Delete Tag from Workbook](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#delete_tag_from_workbook)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`item` | The `WorkbookItem` or workbook ID to remove tags from.
+`tags` | A single tag string or iterable of tag strings to remove.
+
+**Returns**
+
+None.
+
+**Example**
+
+```py
+server.workbooks.delete_tags(workbook_item, 'finance')
+```
+
+<br>
+<br>
+
+#### workbooks.update_tags
+
+```py
+workbooks.update_tags(item)
+```
+
+Updates the tags on the server to match the tags on the specified workbook item. Changes to tags must be made on the `WorkbookItem.tags` attribute before calling this method.
+
+REST API: [Delete Tag from Workbook](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#delete_tag_from_workbook) and [Add Tags to Workbook](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#add_tags_to_workbook)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`item` | The `WorkbookItem` whose tags to synchronize to the server.
+
+**Returns**
+
+None.
+
+**Example**
+
+```py
+workbook_item.tags.add('quarterly')
+server.workbooks.update_tags(workbook_item)
+```
+
+<br>
+<br>
+
+#### workbooks.filter
+
+```py
+workbooks.filter(**kwargs)
+```
+
+Returns a list of workbooks that match the specified filters. Fields and operators are passed as keyword arguments in the form `field_name=value` or `field_name__operator=value`.
+
+REST API: [Filtering and Sorting Workbooks](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_filtering_and_sorting.htm#workbooks)
+
+**Supported fields and operators**
+
+Field | Operators
+:--- | :---
+`content_url` | `eq`, `in`
+`created_at` | `eq`, `gt`, `gte`, `lt`, `lte`
+`display_tabs` | `eq`
+`favorites_total` | `eq`, `gt`, `gte`, `lt`, `lte`
+`has_alerts` | `eq`
+`has_extracts` | `eq`
+`name` | `eq`, `in`
+`owner_domain` | `eq`, `in`
+`owner_email` | `eq`, `in`
+`owner_name` | `eq`, `in`
+`project_name` | `eq`, `in`
+`sheet_count` | `eq`, `gt`, `gte`, `lt`, `lte`
+`size` | `eq`, `gt`, `gte`, `lt`, `lte`
+`subscriptions_total` | `eq`, `gt`, `gte`, `lt`, `lte`
+`tags` | `eq`, `in`
+`updated_at` | `eq`, `gt`, `gte`, `lt`, `lte`
+
+**Returns**
+
+Returns a `QuerySet` of `WorkbookItem` objects.
+
+**Example**
+
+```py
+finance_workbooks = server.workbooks.filter(project_name='Finance', has_extracts=True)
+for wb in finance_workbooks:
+    print(wb.name)
+```
+
+<br>
+<br>
 

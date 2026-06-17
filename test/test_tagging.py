@@ -21,7 +21,9 @@ def get_server() -> TSC.Server:
     return server
 
 
-def add_tag_xml_response_factory(tags: Iterable[str]) -> str:
+def add_tag_xml_response_factory(tags: Iterable[str] | str) -> str:
+    if isinstance(tags, str):
+        tags = [tags]
     root = ET.Element("tsResponse")
     tags_element = ET.SubElement(root, "tags")
     for tag in tags:
@@ -242,3 +244,15 @@ def test_tags_batch_delete(get_server) -> None:
         tag_result = server.tags.batch_delete(tags, content)
 
     assert set(tag_result) == set(tags)
+
+
+def test_tag_with_spaces_is_quoted_in_request() -> None:
+    """Tags containing spaces must be quoted in the XML request to prevent server-side splitting."""
+    from tableauserverclient.server.request_factory import RequestFactory
+
+    tag_set = {"Yearly Sales", "simple"}
+    xml_bytes = RequestFactory.Tag.add_req(tag_set)
+    root = ET.fromstring(xml_bytes)
+    labels = {tag.get("label") for tag in root.findall(".//tag")}
+    assert '"Yearly Sales"' in labels
+    assert "simple" in labels

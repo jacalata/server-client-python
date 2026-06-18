@@ -836,6 +836,8 @@ datasources.delete(datasource_id)
 
 Removes the specified data source from Tableau Server.
 
+REST API: [Delete Data Source](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#delete_data_source)
+
 
 **Parameters**
 
@@ -1279,9 +1281,660 @@ A `JobItem` for the update job on the server. Upon completion of this job, the d
 
 See the `update_datasource_data.py` sample in the Samples directory.
 
+#### datasources.create_extract
+
+```py
+datasources.create_extract(datasource_item, encrypt=False)
+```
+
+Creates an extract for the specified data source.
+
+REST API: [Create an Extract for a Data Source](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_extract_and_encryption.htm#create_extract_for_datasource)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to create an extract for.
+`encrypt` | (Optional) Specifies whether to encrypt the extract. The default is `False`.
+
+**Returns**
+
+Returns a `JobItem` for the extract creation job.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+datasource = server.datasources.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+job = server.datasources.create_extract(datasource, encrypt=True)
+server.jobs.wait_for_job(job)
+```
 
 <br>
 <br>
+
+#### datasources.delete_extract
+
+```py
+datasources.delete_extract(datasource_item)
+```
+
+Removes the extract from the specified data source.
+
+REST API: [Delete the Extract from a Data Source](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_extract_and_encryption.htm#delete_extract_from_datasource)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to remove the extract from.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+datasource = server.datasources.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+server.datasources.delete_extract(datasource)
+```
+
+<br>
+<br>
+
+#### datasources.populate_permissions
+
+```py
+datasources.populate_permissions(datasource_item)
+```
+
+Populates the permissions for the specified data source.
+
+REST API: [List Data Source Permissions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_permissions.htm#query_data_source_permissions)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to populate with permissions.
+
+**Version**
+
+Version 2.0 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+datasource = server.datasources.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+server.datasources.populate_permissions(datasource)
+for permission in datasource.permissions:
+    print(permission.grantee_id, permission.capabilities)
+```
+
+<br>
+<br>
+
+#### datasources.update_permissions
+
+```py
+datasources.update_permissions(datasource_item, permission_item)
+```
+
+Adds or updates permissions for the specified data source.
+
+REST API: [Replace Content Permissions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_permissions.htm#replace_permissions_for_content)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to update permissions for.
+`permission_item` | A list of `PermissionsRule` objects representing the permissions to add or update.
+
+**Version**
+
+Version 2.0 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+<br>
+<br>
+
+#### datasources.delete_permission
+
+```py
+datasources.delete_permission(datasource_item, capability_item)
+```
+
+Removes a permission from the specified data source.
+
+REST API: [Delete Data Source Permission](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_permissions.htm#delete_data_source_permission)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to remove the permission from.
+`capability_item` | The `PermissionsRule` object representing the permission to remove.
+
+**Version**
+
+Version 2.0 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+<br>
+<br>
+
+#### datasources.populate_dqw
+
+```py
+datasources.populate_dqw(datasource_item)
+```
+
+Populates the data quality warnings for the specified data source.
+
+REST API: [Query Data Quality Warning by Content](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_metadata.htm#query_dqws)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to populate with data quality warnings.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+datasource = server.datasources.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+server.datasources.populate_dqw(datasource)
+for dqw in datasource.dqws:
+    print(dqw.message)
+```
+
+<br>
+<br>
+
+#### datasources.add_dqw
+
+```py
+datasources.add_dqw(datasource_item, warning)
+```
+
+Adds a data quality warning to the specified data source.
+
+REST API: [Add Data Quality Warning](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_metadata.htm#add_dqw)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to add the data quality warning to.
+`warning` | The `DQWItem` object representing the data quality warning to add.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+<br>
+<br>
+
+#### datasources.update_dqw
+
+```py
+datasources.update_dqw(datasource_item, warning)
+```
+
+Updates a data quality warning on the specified data source.
+
+REST API: [Update Data Quality Warning](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_metadata.htm#update_dqw)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to update the data quality warning on.
+`warning` | The `DQWItem` object representing the updated data quality warning.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+<br>
+<br>
+
+#### datasources.delete_dqw
+
+```py
+datasources.delete_dqw(datasource_item)
+```
+
+Removes all data quality warnings from the specified data source.
+
+REST API: [Delete Quality Warning Triggers by Content](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_metadata.htm#delete_dqw_triggers)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to remove data quality warnings from.
+
+**Version**
+
+Version 3.5 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+<br>
+<br>
+
+#### datasources.populate_revisions
+
+```py
+datasources.populate_revisions(datasource_item)
+```
+
+Populates the revision history for the specified data source.
+
+REST API: [Get Data Source Revisions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#get_data_source_revisions)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to populate with revision history.
+
+**Exceptions**
+
+Error | Description
+:--- | :---
+`Datasource item missing ID. Datasource must be retrieved from server first.` | Raises an exception if the `datasource_item` does not have an id.
+
+**Version**
+
+Version 2.3 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+datasource = server.datasources.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+server.datasources.populate_revisions(datasource)
+for revision in datasource.revisions:
+    print(revision.revision_number, revision.created_at)
+```
+
+<br>
+<br>
+
+#### datasources.download_revision
+
+```py
+datasources.download_revision(datasource_id, revision_number, filepath=None, include_extract=True)
+```
+
+Downloads a specific revision of the specified data source.
+
+REST API: [Download Data Source Revision](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#download_data_source_revision)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_id` | The identifier (`id`) for the `DatasourceItem`.
+`revision_number` | The revision number to download. Pass `None` to download the current (latest) revision.
+`filepath` | (Optional) Downloads the file to the location you specify. If no location is specified (the default is `filepath=None`), the file is downloaded to the current working directory.
+`include_extract` | (Optional) Specifies whether to download the file with the extract. The default is `True`.
+
+**Exceptions**
+
+Error | Description
+:--- | :---
+`Datasource ID undefined` | Raises an exception if a valid `datasource_id` is not provided.
+
+**Returns**
+
+The file path to the downloaded data source revision.
+
+**Version**
+
+Version 2.3 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+file_path = server.datasources.download_revision(
+    '1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b',
+    revision_number='2'
+)
+print("\nDownloaded revision to {0}.".format(file_path))
+```
+
+<br>
+<br>
+
+#### datasources.delete_revision
+
+```py
+datasources.delete_revision(datasource_id, revision_number)
+```
+
+Removes a specific revision of the specified data source from Tableau Server.
+
+REST API: [Remove Data Source Revision](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#remove_data_source_revision)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_id` | The identifier (`id`) for the `DatasourceItem`.
+`revision_number` | The revision number to delete.
+
+**Version**
+
+Version 2.3 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+server.datasources.delete_revision('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b', '2')
+```
+
+<br>
+<br>
+
+#### datasources.schedule_extract_refresh
+
+```py
+datasources.schedule_extract_refresh(schedule_id, item)
+```
+
+Convenience method to add a data source to an existing extract refresh schedule.
+
+REST API: [Add Data Source to Server Schedule](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_jobs_tasks_and_schedules.htm#add_data_source_to_schedule)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`schedule_id` | The identifier of the schedule to add the data source to.
+`item` | The `DatasourceItem` to add to the schedule.
+
+**Returns**
+
+Returns a list of `AddResponse` objects.
+
+**Version**
+
+Version 2.8 and later. See [REST API versions](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_versions.htm).
+
+**Example**
+
+```py
+datasource = server.datasources.get_by_id('1a2a3b4b-5c6c-7d8d-9e0e-1f2f3a4a5b6b')
+result = server.datasources.schedule_extract_refresh('schedule-id-here', datasource)
+```
+
+<br>
+<br>
+
+#### datasources.update_connection
+
+```py
+datasources.update_connection(datasource_item, connection_item)
+```
+
+Updates the server address, port, username, or password for the specified data source connection.
+
+REST API: [Update Data Source Connection](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#update_data_source_connection)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` to update.
+`connection_item` | The `ConnectionItem` containing the updated connection details.
+
+**Returns**
+
+Returns the updated `ConnectionItem`, or `None` if no connection was returned.
+
+**Example**
+
+```py
+server.datasources.populate_connections(datasource_item)
+conn = datasource_item.connections[0]
+conn.username = 'newuser'
+updated_conn = server.datasources.update_connection(datasource_item, conn)
+```
+
+<br>
+<br>
+
+#### datasources.update_connections
+
+```py
+datasources.update_connections(datasource_item, connection_luids, authentication_type, username=None, password=None, embed_password=None)
+```
+
+Bulk updates one or more datasource connections by LUID.
+
+REST API: [Update Data Source Connections](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#update_data_source_connections)
+
+**Version**
+
+This endpoint is available with REST API version 3.26 and up.
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_item` | The `DatasourceItem` containing the connections to update.
+`connection_luids` | An iterable of connection LUIDs (strings) to update.
+`authentication_type` | The authentication type to use (e.g., `'auth-keypair'`).
+`username` | (Optional) The username to set.
+`password` | (Optional) The password or secret to set.
+`embed_password` | (Optional) Whether to embed the password.
+
+**Returns**
+
+Returns a list of updated `ConnectionItem` objects.
+
+**Example**
+
+```py
+server.datasources.populate_connections(datasource_item)
+luids = [conn.id for conn in datasource_item.connections]
+updated = server.datasources.update_connections(datasource_item, luids, 'auth-keypair', username='myuser', password='mysecret')
+```
+
+<br>
+<br>
+
+#### datasources.update_hyper_data
+
+```py
+datasources.update_hyper_data(datasource_or_connection_item, *, request_id, actions, payload=None)
+```
+
+Incrementally updates data (insert, update, upsert, replace, or delete) in a published datasource from a live-to-Hyper connection.
+
+For all connections to Parquet files and for datasources with a single connection, you can pass a `DatasourceItem`. For datasources with multiple connections, pass a `ConnectionItem` to target the specific connection.
+
+REST API: [Update Data in Hyper Data Source](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#update_data_in_hyper_connection)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`datasource_or_connection_item` | A `DatasourceItem`, `ConnectionItem`, or datasource ID string. Use a `ConnectionItem` when the datasource has multiple connections.
+`request_id` | A user-supplied string to uniquely identify the request. Duplicate requests with the same key are executed only once.
+`actions` | A sequence of action mappings (insert, update, delete, etc.) specifying how to modify the data. See the [REST API documentation](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_how_to_update_data_to_hyper.htm#action-batch-descriptions) for action format.
+`payload` | (Optional) Path to a Hyper file containing tuple data for the actions.
+
+**Returns**
+
+Returns a `JobItem` for the running job on the server.
+
+**Example**
+
+```py
+actions = [{"action": "insert", "source-table": "my_table", "target-table": "my_table"}]
+job = server.datasources.update_hyper_data(
+    datasource_item,
+    request_id='unique-request-id-001',
+    actions=actions,
+    payload='/path/to/data.hyper'
+)
+job = server.jobs.wait_for_job(job)
+```
+
+<br>
+<br>
+
+#### datasources.add_tags
+
+```py
+datasources.add_tags(item, tags)
+```
+
+Adds one or more tags to the specified datasource.
+
+REST API: [Add Tags to Data Source](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#add_tags_to_data_source)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`item` | The `DatasourceItem` or datasource ID to add tags to.
+`tags` | A single tag string or iterable of tag strings to add.
+
+**Returns**
+
+Returns a `set[str]` of the tags added.
+
+**Example**
+
+```py
+server.datasources.add_tags(datasource_item, ['finance', 'quarterly'])
+```
+
+<br>
+<br>
+
+#### datasources.delete_tags
+
+```py
+datasources.delete_tags(item, tags)
+```
+
+Removes one or more tags from the specified datasource.
+
+REST API: [Delete Tag from Data Source](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#delete_tag_from_data_source)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`item` | The `DatasourceItem` or datasource ID to remove tags from.
+`tags` | A single tag string or iterable of tag strings to remove.
+
+**Example**
+
+```py
+server.datasources.delete_tags(datasource_item, 'finance')
+```
+
+<br>
+<br>
+
+#### datasources.update_tags
+
+```py
+datasources.update_tags(item)
+```
+
+Updates the tags on the server to match the tags on the specified datasource item. Changes to tags must be made on the `DatasourceItem.tags` attribute before calling this method.
+
+REST API: [Delete Tag from Data Source](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#delete_tag_from_data_source) and [Add Tags to Data Source](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_data_sources.htm#add_tags_to_data_source)
+
+**Parameters**
+
+Name | Description
+:--- | :---
+`item` | The `DatasourceItem` whose tags to synchronize to the server.
+
+**Example**
+
+```py
+datasource_item.tags.add('quarterly')
+server.datasources.update_tags(datasource_item)
+```
+
+<br>
+<br>
+
+#### datasources.filter
+
+```py
+datasources.filter(**kwargs)
+```
+
+Returns a list of datasources that match the specified filters. Fields and operators are passed as keyword arguments in the form `field_name=value` or `field_name__operator=value`.
+
+REST API: [Filtering & Sorting Datasources](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_filtering_and_sorting.htm#datasources)
+
+**Supported fields and operators**
+
+Field | Operators
+:--- | :---
+`authentication_type` | `eq`, `in`
+`connected_workbook_type` | `eq`, `gt`, `gte`, `lt`, `lte`
+`connection_to` | `eq`, `in`
+`connection_type` | `eq`, `in`
+`content_url` | `eq`, `in`
+`created_at` | `eq`, `gt`, `gte`, `lt`, `lte`
+`database_name` | `eq`, `in`
+`database_user_name` | `eq`, `in`
+`description` | `eq`, `in`
+`favorites_total` | `eq`, `gt`, `gte`, `lt`, `lte`
+`has_alert` | `eq`
+`has_embedded_password` | `eq`
+`has_extracts` | `eq`
+`is_certified` | `eq`
+`is_connectable` | `eq`
+`is_default_port` | `eq`
+`is_hierarchical` | `eq`
+`is_published` | `eq`
+`name` | `eq`, `in`
+`owner_domain` | `eq`, `in`
+`owner_email` | `eq`
+`owner_name` | `eq`, `in`
+`project_name` | `eq`, `in`
+`server_name` | `eq`, `in`
+`server_port` | `eq`
+`size` | `eq`, `gt`, `gte`, `lt`, `lte`
+`table_name` | `eq`, `in`
+`tags` | `eq`, `in`
+`type` | `eq`
+`updated_at` | `eq`, `gt`, `gte`, `lt`, `lte`
+
+**Returns**
+
+Returns a `QuerySet` of `DatasourceItem` objects.
+
+**Example**
+
+```py
+certified_ds = server.datasources.filter(is_certified=True, project_name='Finance')
+for ds in certified_ds:
+    print(ds.name)
+```
+
+<br>
+<br>
+
 
 ---
 

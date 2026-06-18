@@ -256,3 +256,27 @@ def test_tag_with_spaces_is_quoted_in_request() -> None:
     labels = {tag.get("label") for tag in root.findall(".//tag")}
     assert '"Yearly Sales"' in labels
     assert "simple" in labels
+
+
+@pytest.mark.parametrize(
+    "tag, expected_encoded",
+    [
+        ("tag#name", "tag%23name"),  # issue #675: hash must be percent-encoded
+        ("tag.name", "tag.name"),  # issue #994: dot is safe, no encoding needed
+        ("tag+name", "tag%2Bname"),  # plus must be percent-encoded
+        ("tag/name", "tag%2Fname"),  # slash must be percent-encoded (safe='' fix)
+        ("tag name", "tag%20name"),  # space must be percent-encoded
+    ],
+)
+def test_delete_tags_special_characters_encoded(get_server, tag, expected_encoded) -> None:
+    """Verify delete_tags percent-encodes special characters in the tag path segment."""
+    server = get_server
+    workbook = make_workbook()
+
+    with requests_mock.mock() as m:
+        m.delete(requests_mock.ANY, status_code=200)
+        server.workbooks.delete_tags(workbook, tag)
+        history = m.request_history
+
+    assert len(history) == 1
+    assert history[0].url.endswith(f"/tags/{expected_encoded}")

@@ -1412,6 +1412,26 @@ class WebhookRequest:
 
         return ET.tostring(xml_request)
 
+    @_tsrequest_wrapped
+    def update_req(self, xml_request: ET.Element, webhook_item: "WebhookItem") -> bytes:
+        webhook = ET.SubElement(xml_request, "webhook")
+        if webhook_item.name is not None:
+            webhook.attrib["name"] = webhook_item.name
+        if webhook_item.is_enabled is not None:
+            webhook.attrib["isEnabled"] = str(webhook_item.is_enabled).lower()
+
+        if webhook_item._event is not None:
+            source = ET.SubElement(webhook, "webhook-source")
+            ET.SubElement(source, webhook_item._event)
+
+        if webhook_item.url is not None:
+            destination = ET.SubElement(webhook, "webhook-destination")
+            post = ET.SubElement(destination, "webhook-destination-http")
+            post.attrib["method"] = "POST"
+            post.attrib["url"] = webhook_item.url
+
+        return ET.tostring(xml_request)
+
 
 class MetricRequest:
     @_tsrequest_wrapped

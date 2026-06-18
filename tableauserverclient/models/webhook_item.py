@@ -44,6 +44,12 @@ class WebhookItem:
 
     owner_id : str | None
         The identifier (luid) of the user who owns the webhook.
+
+    is_enabled : bool | None
+        Whether the webhook is enabled. Disabled webhooks do not fire.
+
+    status_change_reason : str | None
+        The reason the webhook status last changed (e.g. why it was disabled).
     """
 
     def __init__(self):
@@ -52,8 +58,10 @@ class WebhookItem:
         self.url: str | None = None
         self._event: str | None = None
         self.owner_id: str | None = None
+        self.is_enabled: bool | None = None
+        self.status_change_reason: str | None = None
 
-    def _set_values(self, id, name, url, event, owner_id):
+    def _set_values(self, id, name, url, event, owner_id, is_enabled=None, status_change_reason=None):
         if id is not None:
             self._id = id
         if name:
@@ -64,6 +72,10 @@ class WebhookItem:
             self.event = event
         if owner_id:
             self.owner_id = owner_id
+        if is_enabled is not None:
+            self.is_enabled = is_enabled
+        if status_change_reason is not None:
+            self.status_change_reason = status_change_reason
 
     @property
     def id(self) -> str | None:
@@ -116,7 +128,14 @@ class WebhookItem:
         if owner_tag is not None:
             owner_id = owner_tag.get("id", None)
 
-        return id, name, url, event, owner_id
+        is_enabled = None
+        is_enabled_str = webhook_xml.get("isEnabled", None)
+        if is_enabled_str is not None:
+            is_enabled = is_enabled_str.lower() == "true"
+
+        status_change_reason = webhook_xml.get("statusChangeReason", None)
+
+        return id, name, url, event, owner_id, is_enabled, status_change_reason
 
     def __repr__(self) -> str:
-        return f"<Webhook id={self.id} name={self.name} url={self.url} event={self.event}>"
+        return f"<Webhook id={self.id} name={self.name} url={self.url} event={self.event} is_enabled={self.is_enabled}>"

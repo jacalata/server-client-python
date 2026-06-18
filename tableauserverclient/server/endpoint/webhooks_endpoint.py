@@ -1,6 +1,7 @@
 import logging
 
 from .endpoint import Endpoint, api
+from .exceptions import MissingRequiredFieldError
 from tableauserverclient.server import RequestFactory
 from tableauserverclient.models import WebhookItem, PaginationItem
 
@@ -117,6 +118,33 @@ class Webhooks(Endpoint):
 
         logger.info(f"Created new webhook (ID: {new_webhook.id})")
         return new_webhook
+
+    @api(version="3.6")
+    def update(self, webhook_item: WebhookItem) -> WebhookItem:
+        """
+        Modifies an existing webhook.
+
+        REST API: https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref.htm#update_webhook
+
+        Parameters
+        ----------
+        webhook_item : WebhookItem
+            The webhook item to update. Must have a valid id.
+
+        Returns
+        -------
+        WebhookItem
+            An object containing information about the updated webhook.
+        """
+        if not webhook_item.id:
+            error = "Webhook item missing ID. Webhook must be retrieved from server first."
+            raise MissingRequiredFieldError(error)
+        url = f"{self.baseurl}/{webhook_item.id}"
+        update_req = RequestFactory.Webhook.update_req(webhook_item)
+        server_response = self.put_request(url, update_req)
+        updated_webhook = WebhookItem.from_response(server_response.content, self.parent_srv.namespace)[0]
+        logger.info(f"Updated webhook (ID: {webhook_item.id})")
+        return updated_webhook
 
     @api(version="3.6")
     def test(self, webhook_id: str):

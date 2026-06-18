@@ -13,6 +13,7 @@ GET_XML = TEST_ASSET_DIR / "webhook_get.xml"
 GET_NEW_EVENT_XML = TEST_ASSET_DIR / "webhook_get_new_event.xml"
 CREATE_XML = TEST_ASSET_DIR / "webhook_create.xml"
 CREATE_REQUEST_XML = TEST_ASSET_DIR / "webhook_create_request.xml"
+UPDATE_XML = TEST_ASSET_DIR / "webhook_update.xml"
 
 
 @pytest.fixture(scope="function")
@@ -90,8 +91,7 @@ def test_request_factory():
     assert webhook_request_expected.replace("\r", "") == webhook_request_actual
 
 
-def test_event_setter_none():
-    """Setting event to None should store None without crashing."""
+def test_event_setter_none() -> None:
     item = WebhookItem()
     item.event = "datasource-updated"
     assert item.event == "datasource-updated"
@@ -100,7 +100,7 @@ def test_event_setter_none():
     assert item.event is None
 
 
-def test_event_setter_short_name():
+def test_event_setter_short_name() -> None:
     """Short event names should be stored with the webhook-source-event- prefix."""
     item = WebhookItem()
     item.event = "datasource-updated"
@@ -108,7 +108,7 @@ def test_event_setter_short_name():
     assert item.event == "datasource-updated"
 
 
-def test_event_setter_full_source_name():
+def test_event_setter_full_source_name() -> None:
     """Full webhook-source-event- names should be accepted and stored as-is."""
     item = WebhookItem()
     item.event = "webhook-source-event-datasource-updated"
@@ -116,7 +116,7 @@ def test_event_setter_full_source_name():
     assert item.event == "datasource-updated"
 
 
-def test_event_setter_new_style_event_name():
+def test_event_setter_new_style_event_name() -> None:
     """New-style event names (webhook-event-*) should be stored as-is and not mangled."""
     item = WebhookItem()
     item.event = "webhook-event-user-promoted-admin"
@@ -167,3 +167,53 @@ def test_create_with_source_event_name(server: TSC.Server) -> None:
 
         new_webhook = server.webhooks.create(webhook_model)
         assert new_webhook.id is not None
+
+
+def test_get_parses_is_enabled_and_status_change_reason(server: TSC.Server) -> None:
+    response_xml = UPDATE_XML.read_text()
+    with requests_mock.mock() as m:
+        m.get(server.webhooks.baseurl + "/webhook-id", text=response_xml)
+        webhook = server.webhooks.get_by_id("webhook-id")
+
+        assert webhook.is_enabled is True
+        assert webhook.status_change_reason == ""
+        assert webhook.name == "webhook-name-updated"
+        assert webhook.url == "https://updated-url.example.com/hook"
+
+
+def test_update(server: TSC.Server) -> None:
+    response_xml = UPDATE_XML.read_text()
+    with requests_mock.mock() as m:
+        m.put(server.webhooks.baseurl + "/webhook-id", text=response_xml)
+        webhook_item = WebhookItem()
+        webhook_item._set_values(
+            "webhook-id", "webhook-name-updated", "https://updated-url.example.com/hook", "datasource-created", None
+        )
+        webhook_item.is_enabled = True
+
+        updated_webhook = server.webhooks.update(webhook_item)
+
+        assert updated_webhook.id == "webhook-id"
+        assert updated_webhook.name == "webhook-name-updated"
+        assert updated_webhook.url == "https://updated-url.example.com/hook"
+        assert updated_webhook.is_enabled is True
+
+
+def test_update_missing_id(server: TSC.Server) -> None:
+    webhook_item = WebhookItem()
+    webhook_item.name = "some-webhook"
+    with pytest.raises(Exception):
+        server.webhooks.update(webhook_item)
+
+
+def test_update_request_factory_is_enabled() -> None:
+    webhook_item = WebhookItem()
+    webhook_item._set_values(
+        "webhook-id", "webhook-name", "https://example.com/hook", "datasource-created", None, is_enabled=False
+    )
+
+    request_bytes = RequestFactory.Webhook.update_req(webhook_item)
+    request_str = request_bytes.decode("utf-8")
+
+    assert 'isEnabled="false"' in request_str
+    assert "webhook-name" in request_str

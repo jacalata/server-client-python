@@ -68,6 +68,7 @@ exclude = ['/bin/']
 [tool.pytest.ini_options]
 testpaths = ["test"]
 addopts = "--junitxml=./test.junit.xml -n auto"
+markers = ["e2e: mark test as end-to-end (requires a real Tableau server)"]
 
 [tool.versioneer]
 VCS = "git"

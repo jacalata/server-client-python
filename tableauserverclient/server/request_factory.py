@@ -921,13 +921,21 @@ class TableRequest:
 content_types = Iterable["ColumnItem | DatabaseItem | DatasourceItem | FlowItem | TableItem | WorkbookItem"]
 
 
+def _encode_tag_label(tag: str) -> str:
+    # The server splits unquoted labels on spaces or commas. Wrap in double
+    # quotes so labels containing spaces are stored as a single tag.
+    if " " in tag or "," in tag:
+        return f'"{tag}"'
+    return tag
+
+
 class TagRequest:
     def add_req(self, tag_set):
         xml_request = ET.Element("tsRequest")
         tags_element = ET.SubElement(xml_request, "tags")
         for tag in tag_set:
             tag_element = ET.SubElement(tags_element, "tag")
-            tag_element.attrib["label"] = tag
+            tag_element.attrib["label"] = _encode_tag_label(tag)
         return ET.tostring(xml_request)
 
     @_tsrequest_wrapped
@@ -936,7 +944,7 @@ class TagRequest:
         tags_element = ET.SubElement(tag_batch, "tags")
         for tag in tags:
             tag_element = ET.SubElement(tags_element, "tag")
-            tag_element.attrib["label"] = tag
+            tag_element.attrib["label"] = _encode_tag_label(tag)
         contents_element = ET.SubElement(tag_batch, "contents")
         for item in content:
             content_element = ET.SubElement(contents_element, "content")

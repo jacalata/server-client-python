@@ -39,7 +39,7 @@ class _ResourceTagger(Endpoint):
 
     # Delete a resource's tag by name
     def _delete_tag(self, baseurl, resource_id, tag_name):
-        encoded_tag_name = urllib.parse.quote(tag_name)
+        encoded_tag_name = urllib.parse.quote(tag_name, safe="")
         url = f"{baseurl}/{resource_id}/tags/{encoded_tag_name}"
 
         try:
@@ -124,7 +124,7 @@ class TaggingMixin(abc.ABC, Generic[T]):
             tag_set = set(tags)
 
         for tag in tag_set:
-            encoded_tag_name = urllib.parse.quote(tag)
+            encoded_tag_name = urllib.parse.quote(tag, safe="")
             url = f"{self.baseurl}/{item_id}/tags/{encoded_tag_name}"
             self.delete_request(url)
 

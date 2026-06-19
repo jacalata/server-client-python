@@ -623,12 +623,10 @@ class Workbooks(QuerysetEndpoint[WorkbookItem], TaggingMixin[WorkbookItem]):
         def pdf_fetcher() -> bytes:
             return self._get_wb_pdf(workbook_item, req_options)
 
-        if not self.parent_srv.check_at_least_version("3.23") and req_options is not None:
-            if req_options.view_filters or req_options.view_parameters:
-                raise UnsupportedAttributeError("view_filters and view_parameters are only supported in 3.23+")
-
-            if req_options.viz_height or req_options.viz_width:
-                raise UnsupportedAttributeError("viz_height and viz_width are only supported in 3.23+")
+        if req_options is not None:
+            if not self.parent_srv.check_at_least_version("3.23"):
+                if req_options.view_filters or req_options.view_parameters:
+                    raise UnsupportedAttributeError("view_filters and view_parameters are only supported in 3.23+")
 
         workbook_item._set_pdf(pdf_fetcher)
         logger.info(f"Populated pdf for workbook (ID: {workbook_item.id})")

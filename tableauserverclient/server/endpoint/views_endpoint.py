@@ -204,7 +204,8 @@ class Views(QuerysetEndpoint[ViewItem], TaggingMixin[ViewItem]):
 
         req_options: PDFRequestOptions | None, default None
             Optional request options for the request. These options can include
-            parameters such as orientation and paper size.
+            parameters such as orientation, paper size, and viz dimensions
+            (viz_width and viz_height).
 
         Returns
         -------

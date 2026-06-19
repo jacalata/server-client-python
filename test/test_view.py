@@ -427,8 +427,7 @@ def test_filter_excel(server: TSC.Server) -> None:
         assert response == excel_file
 
 
-def test_pdf_height(server: TSC.Server) -> None:
-    server.version = "3.8"
+def test_pdf_viz_dimensions(server: TSC.Server) -> None:
     response = POPULATE_PDF.read_bytes()
     with requests_mock.mock() as m:
         m.get(

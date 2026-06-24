@@ -42,7 +42,7 @@ tableauserverclient = ["*"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["tableauserverclient*"]
+exclude = ["test*", "samples*", "test_e2e*", "docs*", "dist*", "build*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "versioneer.get_version"}
@@ -68,7 +68,10 @@ exclude = ['/bin/']
 [tool.pytest.ini_options]
 testpaths = ["test"]
 addopts = "--junitxml=./test.junit.xml -n auto"
-markers = ["e2e: mark test as end-to-end (requires a real Tableau server)"]
+markers = [
+    "e2e: mark test as end-to-end (requires a real Tableau server)",
+    "packaging: mark test as requiring a built wheel in dist/",
+]
 
 [tool.versioneer]
 VCS = "git"

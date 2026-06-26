@@ -92,6 +92,7 @@ def test_request_factory():
 
 
 def test_event_setter_none() -> None:
+    """Setting event to None should store None without crashing."""
     item = WebhookItem()
     item.event = "datasource-updated"
     assert item.event == "datasource-updated"

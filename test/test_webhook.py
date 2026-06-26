@@ -202,7 +202,7 @@ def test_update(server: TSC.Server) -> None:
 def test_update_missing_id(server: TSC.Server) -> None:
     webhook_item = WebhookItem()
     webhook_item.name = "some-webhook"
-    with pytest.raises(Exception):
+    with pytest.raises(TSC.MissingRequiredFieldError):
         server.webhooks.update(webhook_item)
 
 
@@ -217,3 +217,60 @@ def test_update_request_factory_is_enabled() -> None:
 
     assert 'isEnabled="false"' in request_str
     assert "webhook-name" in request_str
+
+
+def test_update_request_factory_url_and_event() -> None:
+    """update_req should serialize url and event into the request body."""
+    webhook_item = WebhookItem()
+    webhook_item._set_values("webhook-id", "webhook-name", "https://example.com/hook", "datasource-created", None)
+
+    request_bytes = RequestFactory.Webhook.update_req(webhook_item)
+    request_str = request_bytes.decode("utf-8")
+
+    assert "https://example.com/hook" in request_str
+    assert "webhook-source-event-datasource-created" in request_str
+    assert 'method="POST"' in request_str
+
+
+def test_update_request_factory_partial_update_name_only() -> None:
+    """update_req with only name set should omit url, event, and isEnabled."""
+    webhook_item = WebhookItem()
+    webhook_item.name = "new-name"
+
+    request_bytes = RequestFactory.Webhook.update_req(webhook_item)
+    request_str = request_bytes.decode("utf-8")
+
+    assert "new-name" in request_str
+    assert "isEnabled" not in request_str
+    assert "webhook-source" not in request_str
+    assert "webhook-destination" not in request_str
+
+
+def test_update_request_factory_omits_is_enabled_when_none() -> None:
+    """update_req should not emit isEnabled when is_enabled is None."""
+    webhook_item = WebhookItem()
+    webhook_item._set_values("webhook-id", "webhook-name", "https://example.com/hook", "datasource-created", None)
+    # is_enabled is None by default
+
+    request_bytes = RequestFactory.Webhook.update_req(webhook_item)
+    request_str = request_bytes.decode("utf-8")
+
+    assert "isEnabled" not in request_str
+
+
+def test_parse_is_enabled_false() -> None:
+    """isEnabled='false' in XML should parse to boolean False."""
+    xml = (
+        b"<?xml version='1.0' encoding='UTF-8'?>"
+        b'<tsResponse xmlns="http://tableau.com/api">'
+        b'  <webhook id="wh-1" name="wh" isEnabled="false">'
+        b"    <webhook-source><webhook-source-event-datasource-created /></webhook-source>"
+        b'    <webhook-destination><webhook-destination-http method="POST" url="https://x.example.com/h"/>'
+        b"    </webhook-destination>"
+        b"  </webhook>"
+        b"</tsResponse>"
+    )
+    ns = {"t": "http://tableau.com/api"}
+    webhooks = WebhookItem.from_response(xml, ns)
+    assert len(webhooks) == 1
+    assert webhooks[0].is_enabled is False

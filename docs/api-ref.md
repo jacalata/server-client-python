@@ -4,7 +4,7 @@ layout: docs
 ---
 
 <iframe
-  src="{{ site.baseurl }}/sphinx/index.html"
+  src="https://server-client-python.readthedocs.io/en/latest/"
   style="width:100%; height:80vh; border:none;"
   title="API Reference">
 </iframe>

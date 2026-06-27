@@ -1,9 +1,8 @@
 tableauserverclient
 ===================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. autosummary::
+   :toctree: api
+   :recursive:
 
-.. automodule:: tableauserverclient
-   :members:
+   tableauserverclient
